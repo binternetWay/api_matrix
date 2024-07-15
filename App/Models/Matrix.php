@@ -47,6 +47,15 @@ class Matrix extends Model{
       WHEN types.title ILIKE '%IZAZ%' THEN 'Izaz'
       WHEN types.title ILIKE '%BW%' THEN 'BW'
       WHEN contracts.date > '2020-08-01' THEN 'Way & Izaz' ELSE 'Way' END AS base,
+
+      authentication_contracts.mac,
+      authentication_contracts.user AS pppoe, 
+      authentication_contracts.password AS senha, 
+      authentication_contracts.equipment_serial_number AS serial, 
+      authentication_access_points.title AS olt,
+      authentication_ips.ip,
+      authentication_contracts.port_olt, 
+      authentication_contracts.slot_olt,
       
       contracts.id AS numero_contrato,
       contracts.client_id AS numero_cliente,
@@ -92,7 +101,13 @@ class Matrix extends Model{
       inadimplencia.faixa_atraso,
       planos.plano,
       fin_col.title AS banco_emissor,
+      v_invoice_type AS tipo_faturamento,
       
+      CASE 
+      WHEN v_invoice_type ILIKE '%Antecipado%' AND fin_col.title NOT ILIKE '%Cartão de Crédito%' THEN 'Carnê'
+      WHEN v_invoice_type NOT ILIKE '%Antecipado%' AND fin_col.title NOT ILIKE '%Cartão de Crédito%' THEN 'Boleto'
+      ELSE 'Cartão' END AS tipo_pagamento,
+
       -- organizando as colunas de telefone
       SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(people.phone, '(', '') ,')',''),'-',''),' ','')::VARCHAR, 1, 20) AS Telefone_1,
       
@@ -129,6 +144,11 @@ class Matrix extends Model{
         LEFT JOIN people_addresses AS address ON address.id = contracts.people_address_id
         LEFT JOIN people AS vendedor ON vendedor.id = contracts.seller_1_id
       
+
+
+      LEFT JOIN authentication_contracts ON authentication_contracts.contract_id = contracts.id
+      LEFT JOIN authentication_access_points ON authentication_access_points.id = authentication_contracts.authentication_access_point_id
+      LEFT JOIN authentication_ips ON authentication_access_points.authentication_ip_id = authentication_ips.id
       
         -- Left para informações de plano
         LEFT JOIN (

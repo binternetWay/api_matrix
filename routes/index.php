@@ -31,7 +31,6 @@ require_once '../src/dependencies.php';
 
 $container->get('db');
 
-
 $app->post('/token', AutenticacaoController::class . ':postAutenticacao');
 
 $app->group('/api/v1', function(){

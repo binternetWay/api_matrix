@@ -7,7 +7,7 @@ class Connection {
 		try {
 
 			$conn = new \PDO(
-				"pgsql:host=191.242.48.3;port=5432;dbname=dbemp00372",
+				"pgsql:host=srd.internetway.com.br;port=5432;dbname=dbemp00372",
 				"cliente_s",
 				"8hnHjcBu2e5TkWGx" 
 			);
